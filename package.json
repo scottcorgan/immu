@@ -1,0 +1,15 @@
+{
+  "name": "immu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node __test__/index.js | tap-spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tap-spec": "^4.0.2",
+    "tessed": "^2.0.0"
+  }
+}
