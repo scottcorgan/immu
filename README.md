@@ -1,14 +1,17 @@
 # immu
 
-A TINY, fail-fast, "naked" immutable data structure library.
+A TINY, fail-fast, "naked", simple immutable data structure library.
 
-* By TINY, I mean less than 900 bytes not minified, not gzipped.
-* By fail-fast, I mean you'll be notified if you try to change a proprety.
-* By naked, I mean they're just objects, arrays, etc. Nothing fancy.
+* By *TINY*, I mean less than 900 bytes not minified, not gzipped.
+* By *fail-fast*, I mean you'll be notified if you try to change a proprety.
+* By *naked*, I mean they're just objects, arrays, etc. Nothing fancy.
+* By *simple*, I mean that it doesn't really add any extra features to your code.
+
+**Immu** doesn't use `Object.freeze()` in production, so [these performance issues](http://jsperf.com/freeze-vs-seal-vs-normal/3) aren't a concern.
 
 ## Why immutable data?
 
-Because, bugs happen because developers write them. This just puts one more layer between you and your code exloding.
+Bugs happen because developers write them. This just puts one more layer between you and your code exloding.
 
 ## Install
 
