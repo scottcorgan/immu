@@ -2,7 +2,7 @@
 
 A TINY, fail-fast, "naked", simple immutable data structure library.
 
-* By *TINY*, I mean less than 900 bytes not minified, not gzipped.
+* By *TINY*, I mean 1k not minified, not gzipped.
 * By *fail-fast*, I mean you'll be notified if you try to change a proprety.
 * By *naked*, I mean they're just objects, arrays, etc. Nothing fancy.
 * By *simple*, I mean that it doesn't really add any extra features to your code.
