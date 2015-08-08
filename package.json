@@ -1,6 +1,6 @@
 {
   "name": "immu",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A TINY, fail-fast, \"naked\" immutable data structure library",
   "main": "index.js",
   "scripts": {
