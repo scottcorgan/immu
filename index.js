@@ -49,7 +49,11 @@ function immu (data) {
     }
   };
 
-  return Object.create({}, definedProps);
+  var immuData = Object.create({}, definedProps);
+
+  return process && process.env && process.env.NODE_ENV === 'production'
+    ? immuData
+    : Object.freeze(immuData);
 }
 
 module.exports = immu;

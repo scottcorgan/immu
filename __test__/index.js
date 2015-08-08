@@ -89,6 +89,8 @@ test('arrays', function (assert) {
     assert.pass('can\'t mutate and immutable object');
     assert.equal(immuArr[0], 1, 'keeps original value after trying to change');
   }
+
+  // test array of objects
 });
 
 test('mixed objects and arrays', function (assert) {
@@ -146,6 +148,25 @@ test('try to immutable already immutable data', function (assert) {
   catch (e) {
     assert.pass('can\'t mutate and immutable object');
   }
+});
+
+test('adding new attributes', function (assert) {
+
+  process.env.NODE_ENV = 'development';
+  var obj = {
+    a: 'b'
+  };
+  var immuObj = immu(obj);
+  immuObj.c = 'd';
+  assert.equal(immuObj.c, undefined, 'can\'t set new proprety in development');
+
+  process.env.NODE_ENV = 'production';
+  var obj2 = {
+    a: 'b'
+  };
+  var immuObj2 = immu(obj2);
+  immuObj2.c = 'd';
+  assert.equal(immuObj2.c, 'd', 'can set new proprety in production (for performance)');
 });
 
 
