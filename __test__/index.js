@@ -1,9 +1,8 @@
 var namespace = require('tessed').namespace;
 var immu = require('../');
 
+var hugeJSON = require('./fixtures/huge');
 var test = namespace('immu');
-// test.obj = namespace('object');
-// test.arr = namespace('array');
 
 test('returns fast for non-object values', function (assert) {
 
@@ -94,11 +93,59 @@ test('arrays', function (assert) {
 
 test('mixed objects and arrays', function (assert) {
 
+  var immuObj = immu(hugeJSON);
 
+  assert.equal(immuObj.data[0].type, 'designers', 'deep value');
+
+  try {
+    immuObj.data[0].type = 'test';
+    assert.fail('shouldn\'t be able to mutate an immutable object');
+  }
+  catch (e) {
+    assert.pass('can\'t mutate and immutable object');
+  }
 });
 
-test('toJS()', function () {});
-test('already immutable', function () {});
-test('equality', function () {});
+test('toJS()', function (assert) {
+
+  var obj = {
+    a: {
+      b: {
+        c: 'd'
+      }
+    }
+  }
+  var immuObj = immu(obj);
+
+  assert.deepEqual(immuObj.toJS(), obj, 'get raw object back');
+
+  var backToJs = immuObj.toJS();
+  assert.equal(backToJs.toJS, undefined, 'removes toJS()');
+
+  try {
+    backToJs.a = 'changed';
+    assert.equal(backToJs.a, 'changed', 'returns mutable object');
+  }
+  catch (e) {
+    assert.fail('should be able to change mutable value');
+  }
+});
+
+test('try to immutable already immutable data', function (assert) {
+
+  var obj = {a: 'b'};
+  var immuObj = immu(obj);
+  var immuImmuObj = immu(immuObj);
+
+  assert.equal(typeof immuImmuObj.toJS, 'function', 'toJS() method available');
+
+  try {
+    immuImmuObj.a = 'changed'
+    assert.fail('shouldn\'t be able to mutate an immutable object');
+  }
+  catch (e) {
+    assert.pass('can\'t mutate and immutable object');
+  }
+});
 
 

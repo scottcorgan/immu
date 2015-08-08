@@ -1,15 +1,35 @@
 {
   "name": "immu",
   "version": "1.0.0",
-  "description": "",
+  "description": "A TINY, fail-fast, \"naked\" immutable data structure library",
   "main": "index.js",
   "scripts": {
     "test": "node __test__/index.js | tap-spec"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Scott Corgan",
+  "license": "MIT",
   "devDependencies": {
     "tap-spec": "^4.0.2",
     "tessed": "^2.0.0"
-  }
+  },
+  "dependencies": {
+    "merge": "^1.2.0",
+    "tap-spec": "^4.0.2",
+    "object-assign": "^3.0.0",
+    "tessed": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scottcorgan/immu.git"
+  },
+  "keywords": [
+    "immutable",
+    "data",
+    "structure",
+    "freeze"
+  ],
+  "bugs": {
+    "url": "https://github.com/scottcorgan/immu/issues"
+  },
+  "homepage": "https://github.com/scottcorgan/immu#readme"
 }

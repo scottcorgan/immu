@@ -15,6 +15,11 @@ function immu (data) {
     return data;
   }
 
+  // Already immutable
+  if (typeof data.toJS === 'function') {
+    return data;
+  }
+
   var definedProps = {};
 
   Object.keys(data).forEach(function (key) {
@@ -35,12 +40,16 @@ function immu (data) {
     };
   });
 
-  return Object.create({
-    toJS: function () {
+  definedProps.toJS = {
+    enumerable: false,
+    configurable: false,
+    value: function () {
 
       return data;
     }
-  }, definedProps);
+  };
+
+  return Object.create({}, definedProps);
 }
 
 module.exports = immu;
