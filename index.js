@@ -1,5 +1,7 @@
 // TODO: how do we handle Date, RegExp, HTMLDocument?
 
+'use strict';
+
 var alreadyImmutable = {
   'function': true,
   'string': true,
@@ -31,7 +33,7 @@ function immu (data) {
       configurable: false,
       set: function () {
 
-        throw new Error('Cannot change value of an immutable property');
+        throw new TypeError('Cannot change value of an immutable property');
       },
       get: function () {
 
