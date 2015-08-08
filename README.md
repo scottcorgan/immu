@@ -1,4 +1,4 @@
-# immu
+# immu [![NPM Module](http://img.shields.io/npm/v/immu.svg?style=flat-square)](https://npmjs.org/package/immu) [![NPM download count](https://img.shields.io/npm/dm/immu.svg?style=flat-square)](https://npmjs.org/package/immu) [![Build Status](http://img.shields.io/travis/scottcorgan/immu.svg?style=flat-square)](https://travis-ci.org/scottcorgan/immu)
 
 A TINY, fail-fast, "naked", simple immutable data structure library.
 
