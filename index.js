@@ -198,7 +198,7 @@ function immuArrProps (data, definedProps) {
 
       return function () {
 
-        var args = Array.prototype.slice.call(arguments);
+        var args = asArray(arguments);
         return immu(args.concat(data));
       };
     }
@@ -216,6 +216,10 @@ function immuArrProps (data, definedProps) {
 
       return function (fn) {
 
+        if (!fn) {
+          return immu(data.sort());
+        }
+
         return immu(data.sort(function (a, b) {
 
           return fn(immu(a), immu(b));
@@ -224,15 +228,35 @@ function immuArrProps (data, definedProps) {
     }
   };
 
-  /*
+  definedProps.splice = {
+    enumerable: false,
+    configurable: false,
+    set: function () {
 
-  Mutator methods
-  ---------------
-  sort
-  splice
-  */
+      // TODO: test this
+      throw new TypeError('Cannot change the "splice()" method on an immutable object');
+    },
+    get: function () {
+
+      return function () {
+
+        var start = arguments[0];
+        var deleteCount = arguments[1];
+        var items = asArray(arguments).slice(2) || [];
+        var beginning = data.slice(0, start);
+        var end = data.slice(start + deleteCount);
+
+        return beginning.concat(items, end);
+      };
+    }
+  };
 
   return definedProps;
+}
+
+function asArray (args) {
+
+  return Array.prototype.slice.call(args);
 }
 
 module.exports = immu;

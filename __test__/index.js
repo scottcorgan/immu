@@ -387,12 +387,41 @@ test.arrays.mutator('reverse', function (assert) {
 
 test.arrays.mutator('sort', function (assert) {
 
+  var arr = [4,2,3,1];
+  var immuArr = immu(arr);
 
+  assert.deepEqual(immuArr.sort(), [1,2,3,4], 'basic sort');
+
+  var objArr = [{age: 31}, {age: 27}, {age: 51}];
+  var immuObjArr = immu(objArr);
+
+  var sortedImmuObjArr = immuObjArr.sort(function (a, b) {
+
+    if (a.age > b.age) {
+      return 1;
+    }
+
+    if (a.age < b.age) {
+      return -1;
+    }
+
+    return 0;
+  });
+
+  assert.deepEqual(
+    sortedImmuObjArr,
+    [{age: 27}, {age: 31}, {age: 51}],
+    'custom sort function'
+  );
 });
 
 test.arrays.mutator('splice', function (assert) {
 
+  var arr = [1, 2, 3, 4];
+  var immuArr = immu(arr);
 
+  assert.deepEqual(immuArr.splice(1, 1), [1, 3, 4], 'remove item');
+  assert.deepEqual(immuArr.splice(1, 1, 'two'), [1, 'two', 3, 4], 'remove and insert');
 });
 
 
