@@ -22,9 +22,11 @@ npm install immu --save
 ## Usage
 
 ```js
-var immu = require('immu');
+'use strict';
 
-var user = {
+let immu = require('immu');
+
+let user = {
   name: 'Scott',
   age: 31,
   location: 'somewhere'
