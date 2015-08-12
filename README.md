@@ -2,10 +2,10 @@
 
 A TINY, fail-fast, "naked", simple immutable data structure library.
 
-* By *TINY*, I mean 1k not minified, not gzipped.
+* By *TINY*, less than 1k gzipped and minified.
 * By *fail-fast*, I mean you'll be notified if you try to change a proprety.
-* By *naked*, I mean they're just objects, arrays, etc. Nothing fancy.
-* By *simple*, I mean that it doesn't really add any extra features to your code.
+* By *naked*, I mean they work like regular objects and arrays.
+* By *simple*, I mean that it doesn't add any extra features to your code (except immutability, of course).
 
 **Immu** doesn't use `Object.freeze()` in production, so [these performance issues](http://jsperf.com/freeze-vs-seal-vs-normal/3) aren't a concern.
 
@@ -43,6 +43,11 @@ console.log(immutableUser.name) // Scott
 
 // Get the raw object back
 console.log(immutableUser.toJS()); // {name: 'Scott', age: 31, location: 'somewhere'}
+
+let list = immu([1, 2, 3, 4]);
+let newList = list
+  .map(item => item + 1)
+  .filter(item => item % 2 === 0);
 ```
 
 ## Run Tests
