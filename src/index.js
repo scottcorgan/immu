@@ -21,6 +21,7 @@ function immu (data) {
   }
 
   const __PRODUCTION__ = process && process.env && process.env.NODE_ENV === 'production';
+
   let isArray = Array.isArray(data);
   let definedProps = {
     toJS: {
@@ -93,17 +94,19 @@ function immuArrProps (data, definedProps) {
       });
     });
 
-  ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse']
+  [
+    'concat',
+    'join',
+    'slice',
+    'indexOf',
+    'lastIndexOf',
+    'reverse',
+    'toString',
+    'toLocaleString'
+  ]
     .forEach(name => {
 
       definedProps[name] = defProp(name, () => (...args) => immu(data[name](...args)));
-    });
-
-  // TODO: memoize this
-  ['toString', 'toLocaleString']
-    .forEach(name => {
-
-      definedProps[name] = defProp(name, () => () => data[name]());
     });
 
   definedProps.push = defProp('push', () => (...args) => immu(data.concat(...args)));

@@ -26,6 +26,7 @@ function immu(data) {
   }
 
   var __PRODUCTION__ = process && process.env && process.env.NODE_ENV === 'production';
+
   var isArray = Array.isArray(data);
   var definedProps = {
     toJS: {
@@ -100,21 +101,11 @@ function immuArrProps(data, definedProps) {
     });
   });
 
-  ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse'].forEach(function (name) {
+  ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse', 'toString', 'toLocaleString'].forEach(function (name) {
 
     definedProps[name] = defProp(name, function () {
       return function () {
         return immu(data[name].apply(data, arguments));
-      };
-    });
-  });
-
-  // TODO: memoize this
-  ['toString', 'toLocaleString'].forEach(function (name) {
-
-    definedProps[name] = defProp(name, function () {
-      return function () {
-        return data[name]();
       };
     });
   });
