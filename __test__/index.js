@@ -1,401 +1,408 @@
-var namespace = require('tessed').namespace;
-var immu = require('../');
+import {namespace} from 'tessed';
+import immu from '../src';
 
-var hugeJSON = require('./fixtures/huge');
-var test = namespace('immu');
+import hugeJSON from './fixtures/huge';
+let test = namespace('immu');
+
 test.arrays = test.namespace('array');
 test.arrays.iteration = test.arrays.namespace('iteration');
 test.arrays.accessor = test.arrays.namespace('accessor');
 test.arrays.mutator = test.arrays.namespace('mutator');
 
-test('returns fast for non-object values', function (assert) {
+test('returns fast for non-object values', ({equal}) => {
 
-  var str = 'test';
-  var immuStr = immu(str);
-  assert.equal(immuStr, str, 'does nothing to strings');
+  let str = 'test';
+  let immuStr = immu(str);
+  equal(immuStr, str, 'does nothing to strings');
 
-  var num = 1;
-  var immuNum = immu(num);
-  assert.equal(immuNum, num, 'does nother to numbers');
+  let num = 1;
+  let immuNum = immu(num);
+  equal(immuNum, num, 'does nother to numbers');
 
-  var nully = null;
-  var immuNully = immu(nully);
-  assert.equal(immuNully, nully, 'does nothing to null');
+  let nully = null;
+  let immuNully = immu(nully);
+  equal(immuNully, nully, 'does nothing to null');
 
-  var und;
-  var immuUnd = immu(und);
-  assert.equal(immuUnd, und, 'does nothing to undefined');
+  let und;
+  let immuUnd = immu(und);
+  equal(immuUnd, und, 'does nothing to undefined');
 
-  var bool = false;
-  var immuBool = immu(bool);
-  assert.equal(immuBool, bool, 'does nothing to boolean');
+  let bool = false;
+  let immuBool = immu(bool);
+  equal(immuBool, bool, 'does nothing to boolean');
 
   // NOTE: since functions can have properties as well, how do we immu this?
-  var func = function () {};
-  var immuFunc = immu(func);
-  assert.equal(immuFunc, func, 'does nothing to functions');
+  let func = function () {};
+  let immuFunc = immu(func);
+  equal(immuFunc, func, 'does nothing to functions');
 });
 
-test('simple object', function (assert) {
+test('simple object', ({deepEqual, pass, fail, equal}) => {
 
-  var obj = {
+  let obj = {
     a: 'b',
     c: 'd'
   };
-  var immuObj = immu(obj);
+  let immuObj = immu(obj);
 
-  assert.deepEqual(immuObj, obj, 'objects equal');
+  deepEqual(immuObj, obj, 'objects equal');
   try {
     immuObj.a = 'changed';
-    assert.fail('shouldn\'t be able to mutate an immutable object');
+    fail('shouldn\'t be able to mutate an immutable object');
   }
   catch (e) {
-    assert.pass('can\'t mutate and immutable object');
-    assert.equal(immuObj.a, 'b', 'keeps original value after trying to change');
+    pass('can\'t mutate and immutable object');
+    equal(immuObj.a, 'b', 'keeps original value after trying to change');
   }
 
-  assert.deepEqual(Object.keys(immuObj), ['a', 'c'], 'keeps keys enumerable');
+  deepEqual(Object.keys(immuObj), ['a', 'c'], 'keeps keys enumerable');
 
   // TODO: test that property can't be configured
 });
 
-test('deep object', function (assert) {
+test('deep object', ({equal, deepEqual}) => {
 
-  var deepObj = {
+  let deepObj = {
     a: {
       b: {
         c: 'd'
       }
     }
   };
-  var immuDeepObj = immu(deepObj);
+  let immuDeepObj = immu(deepObj);
 
-  assert.deepEqual(immuDeepObj, deepObj, 'matches keep properties');
-  assert.deepEqual(immuDeepObj.a.b, {c: 'd'}, 'mostly deep property');
-  assert.equal(immuDeepObj.a.b.c, 'd', 'getter for deep property');
+  deepEqual(immuDeepObj, deepObj, 'matches keep properties');
+  deepEqual(immuDeepObj.a.b, {c: 'd'}, 'mostly deep property');
+  equal(immuDeepObj.a.b.c, 'd', 'getter for deep property');
 });
 
-test('mixed objects and arrays', function (assert) {
+test('mixed objects and arrays', ({equal, pass, fail}) => {
 
-  var immuObj = immu(hugeJSON);
+  let immuObj = immu(hugeJSON);
 
-  assert.equal(immuObj.data[0].type, 'designers', 'deep value');
+  equal(immuObj.data[0].type, 'designers', 'deep value');
 
   try {
     immuObj.data[0].type = 'test';
-    assert.fail('shouldn\'t be able to mutate an immutable object');
+    fail('shouldn\'t be able to mutate an immutable object');
   }
   catch (e) {
-    assert.pass('can\'t mutate and immutable object');
+    pass('can\'t mutate and immutable object');
   }
 });
 
-test('toJS()', function (assert) {
+test('toJS()', ({deepEqual, equal, fail}) => {
 
-  var obj = {
+  let obj = {
     a: {
       b: {
         c: 'd'
       }
     }
   }
-  var immuObj = immu(obj);
+  let immuObj = immu(obj);
 
-  assert.deepEqual(immuObj.toJS(), obj, 'get raw object back');
+  deepEqual(immuObj.toJS(), obj, 'get raw object back');
 
-  var backToJs = immuObj.toJS();
-  assert.equal(backToJs.toJS, undefined, 'removes toJS()');
+  let backToJs = immuObj.toJS();
+  equal(backToJs.toJS, undefined, 'removes toJS()');
 
   try {
     backToJs.a = 'changed';
-    assert.equal(backToJs.a, 'changed', 'returns mutable object');
+    equal(backToJs.a, 'changed', 'returns mutable object');
   }
   catch (e) {
-    assert.fail('should be able to change mutable value');
+    fail('should be able to change mutable value');
   }
 });
 
-test('try to immutable already immutable data', function (assert) {
+test('try to immutable already immutable data', ({equal, pass, fail}) => {
 
-  var obj = {a: 'b'};
-  var immuObj = immu(obj);
-  var immuImmuObj = immu(immuObj);
+  let obj = {a: 'b'};
+  let immuObj = immu(obj);
+  let immuImmuObj = immu(immuObj);
 
-  assert.equal(typeof immuImmuObj.toJS, 'function', 'toJS() method available');
+  equal(typeof immuImmuObj.toJS, 'function', 'toJS() method available');
 
   try {
     immuImmuObj.a = 'changed'
-    assert.fail('shouldn\'t be able to mutate an immutable object');
+    fail('shouldn\'t be able to mutate an immutable object');
   }
   catch (e) {
-    assert.pass('can\'t mutate and immutable object');
+    pass('can\'t mutate and immutable object');
   }
 });
 
-test('adding new attributes', function (assert) {
+test('adding new attributes', ({equal, fail, pass}) => {
 
   process.env.NODE_ENV = 'development';
-  var obj = {
+  let obj = {
     a: 'b'
   };
-  var immuObj = immu(obj);
-  immuObj.c = 'd';
-  assert.equal(immuObj.c, undefined, 'can\'t set new proprety in development');
+  let immuObj = immu(obj);
+  try {
+    immuObj.c = 'd';
+    fail('Shouldn\'t be able to set value on frozen object in dev environment');
+  }
+  catch (e) {
+    pass('frozen object in dev environment');
+    equal(immuObj.c, undefined, 'can\'t set new proprety in development');
+  }
 
   process.env.NODE_ENV = 'production';
-  var obj2 = {
+  let obj2 = {
     a: 'b'
   };
-  var immuObj2 = immu(obj2);
+  let immuObj2 = immu(obj2);
   immuObj2.c = 'd';
-  assert.equal(immuObj2.c, 'd', 'can set new proprety in production (for performance)');
+  equal(immuObj2.c, 'd', 'can set new proprety in production (for performance)');
 });
 
-test.arrays('base', function (assert) {
+test.arrays('base', ({equal, deepEqual, pass, fail}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  assert.deepEqual(immuArr, arr, 'is equal');
+  deepEqual(immuArr, arr, 'is equal');
 
   // NOTE: does this even matter?
-  // assert.equal(Array.isArray(immuArr), true, 'is an array');
+  // equal(Array.isArray(immuArr), true, 'is an array');
 
   try {
     immuArr[0] = 'asdf';
-    assert.fail('shouldn\'t be able to mutate an immutable object');
+    fail('shouldn\'t be able to mutate an immutable object');
   }
   catch (e) {
-    assert.pass('can\'t mutate and immutable object');
-    assert.equal(immuArr[0], 1, 'keeps original value after trying to change');
+    pass('can\'t mutate and immutable object');
+    equal(immuArr[0], 1, 'keeps original value after trying to change');
   }
 
-  assert.equal(immuArr.length, 4, 'length');
+  equal(immuArr.length, 4, 'length');
   try {
     immuArr.length = 5
-    assert.fail('immutable length shouldn\'t be set');
+    fail('immutable length shouldn\'t be set');
   }
   catch (e) {
-    assert.pass('can\'t set length');
+    pass('can\'t set length');
   }
 
   // test array of objects
 });
 
-test.arrays.iteration('forEach', function (assert) {
+test.arrays.iteration('forEach', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var count = 0;
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let count = 0;
 
   immuArr.forEach(function (i) {
 
     count += 1;
   });
 
-  assert.equal(count, 4, 'forEach over all values');
+  equal(count, 4, 'forEach over all values');
 });
 
-test.arrays.iteration('map', function (assert) {
+test.arrays.iteration('map', ({equal, deepEqual}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  var mappedArr = immuArr.map(function (i) {
+  let mappedArr = immuArr.map(function (i) {
 
     return i + 1;
   });
 
-  assert.equal(typeof mappedArr.toJS, 'function', 'immu data object');
-  assert.deepEqual(mappedArr.toJS(), [2,3,4,5], 'mapped values');
+  equal(typeof mappedArr.toJS, 'function', 'immu data object');
+  deepEqual(mappedArr.toJS(), [2,3,4,5], 'mapped values');
 });
 
-test.arrays.iteration('filter', function (assert) {
+test.arrays.iteration('filter', ({equal, deepEqual}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  var filteredArr = immuArr.filter(function (i) {
+  let filteredArr = immuArr.filter(function (i) {
 
     return i % 2 === 0;
   });
 
-  assert.equal(typeof filteredArr.toJS, 'function', 'immu data object');
-  assert.deepEqual(filteredArr.toJS(), [2,4], 'filtered values');
+  equal(typeof filteredArr.toJS, 'function', 'immu data object');
+  deepEqual(filteredArr.toJS(), [2,4], 'filtered values');
 });
 
-test.arrays.iteration('some', function (assert) {
+test.arrays.iteration('some', ({deepEqual}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  var someArr = immuArr.some(function (i) {
+  let someArr = immuArr.some(function (i) {
 
     return i === 2;
   });
 
-  assert.deepEqual(someArr, true, 'some value');
+  deepEqual(someArr, true, 'some value');
 });
 
-test.arrays.iteration('every', function (assert) {
+test.arrays.iteration('every', ({deepEqual}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  var everyArr = immuArr.every(function (i) {
+  let everyArr = immuArr.every(function (i) {
 
     return typeof i === 'number';
   });
 
-  assert.deepEqual(everyArr, true, 'every value');
+  deepEqual(everyArr, true, 'every value');
 });
 
-test.arrays.iteration('reduce', function (assert) {
+test.arrays.iteration('reduce', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var total = immuArr.reduce(function (prev, curr) {
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let total = immuArr.reduce(function (prev, curr) {
 
     return String(prev) + String(curr);
   }, 0);
 
-  assert.equal(total, '01234', 'concatenated all numbers');
+  equal(total, '01234', 'concatenated all numbers');
 });
 
-test.arrays.iteration('reduceRight', function (assert) {
+test.arrays.iteration('reduceRight', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var total = immuArr.reduceRight(function (prev, curr) {
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let total = immuArr.reduceRight(function (prev, curr) {
 
     return String(prev) + String(curr);
   }, 0);
 
-  assert.equal(total, '04321', 'concatenated all numbers');
+  equal(total, '04321', 'concatenated all numbers');
 });
 
-test.arrays.accessor('concat', function (assert) {
+test.arrays.accessor('concat', ({equal, deepEqual}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var concatImmuArr = immuArr.concat(5, 6);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let concatImmuArr = immuArr.concat(5, 6);
 
-  assert.equal(typeof concatImmuArr.concat, 'function', 'method exists');
-  assert.equal(typeof concatImmuArr.toJS, 'function', 'value is immutable');
-  assert.deepEqual(concatImmuArr, [1,2,3,4,5,6], 'concat values');
+  equal(typeof concatImmuArr.concat, 'function', 'method exists');
+  equal(typeof concatImmuArr.toJS, 'function', 'value is immutable');
+  deepEqual(concatImmuArr, [1,2,3,4,5,6], 'concat values');
 });
 
-test.arrays.accessor('join', function (assert) {
+test.arrays.accessor('join', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var joinImmuArr = immuArr.join(', ');
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let joinImmuArr = immuArr.join(', ');
 
-  assert.equal(joinImmuArr, '1, 2, 3, 4', 'join values');
+  equal(joinImmuArr, '1, 2, 3, 4', 'join values');
 });
 
-test.arrays.accessor('slice', function (assert) {
+test.arrays.accessor('slice', ({equal, deepEqual}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var sliceImmuArr = immuArr.slice(0, 1);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let sliceImmuArr = immuArr.slice(0, 1);
 
-  assert.equal(typeof sliceImmuArr.slice, 'function', 'method exists');
-  assert.equal(typeof sliceImmuArr.toJS, 'function', 'value is immutable');
-  assert.deepEqual(sliceImmuArr, [1], 'slice values');
+  equal(typeof sliceImmuArr.slice, 'function', 'method exists');
+  equal(typeof sliceImmuArr.toJS, 'function', 'value is immutable');
+  deepEqual(sliceImmuArr, [1], 'slice values');
 });
 
-test.arrays.accessor('toString', function (assert) {
+test.arrays.accessor('toString', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  assert.equal(immuArr.toString(), arr.toString(), 'stringed array');
+  equal(immuArr.toString(), arr.toString(), 'stringed array');
 });
 
-test.arrays.accessor('toLocalString', function (assert) {
+test.arrays.accessor('toLocalString', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
 
-  assert.equal(immuArr.toLocaleString(), arr.toLocaleString(), 'stringed array');
+  equal(immuArr.toLocaleString(), arr.toLocaleString(), 'stringed array');
 });
 
-test.arrays.accessor('indexOf', function (assert) {
+test.arrays.accessor('indexOf', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var idx = immuArr.indexOf(1);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let idx = immuArr.indexOf(1);
 
-  assert.equal(idx, 0, 'index value');
+  equal(idx, 0, 'index value');
 });
 
-test.arrays.accessor('lastIndexOf', function (assert) {
+test.arrays.accessor('lastIndexOf', ({equal}) => {
 
-  var arr = [1,2,3,4];
-  var immuArr = immu(arr);
-  var idx = immuArr.lastIndexOf(1);
+  let arr = [1,2,3,4];
+  let immuArr = immu(arr);
+  let idx = immuArr.lastIndexOf(1);
 
-  assert.equal(idx, 0, 'index value');
+  equal(idx, 0, 'index value');
 });
 
-test.arrays.mutator('push', function (assert) {
+test.arrays.mutator('push', ({deepEqual}) => {
 
-  var arr = [1,2];
-  var immuArr = immu(arr);
-  var pushedImmuArr = immuArr.push(3, 4);
+  let arr = [1,2];
+  let immuArr = immu(arr);
+  let pushedImmuArr = immuArr.push(3, 4);
 
-  assert.deepEqual(pushedImmuArr, [1,2,3,4], 'pushed values on array');
-  assert.deepEqual(immuArr, [1,2], 'did not mutate original array');
+  deepEqual(pushedImmuArr, [1,2,3,4], 'pushed values on array');
+  deepEqual(immuArr, [1,2], 'did not mutate original array');
 });
 
 // TODO: what should pop do?
-test.arrays.mutator.skip('pop', function (assert) {
+test.arrays.mutator.skip('pop', ({deepEqual, equal}) => {
 
-  var arr = [1,2];
-  var immuArr = immu(arr);
-  var val = immuArr.pop();
+  let arr = [1,2];
+  let immuArr = immu(arr);
+  let val = immuArr.pop();
 
-  assert.equal(val, 2, 'popped value');
-  assert.deepEqual(immuArr, [1])
+  equal(val, 2, 'popped value');
+  deepEqual(immuArr, [1])
 });
 
 // TODO: what should shift do?
-test.arrays.mutator('shift', function (assert) {
+test.arrays.mutator('shift', () => {
 
 
 });
 
-test.arrays.mutator('unshift', function (assert) {
+test.arrays.mutator('unshift', ({deepEqual}) => {
 
-  var arr = [1,2];
-  var immuArr = immu(arr);
-  var shiftedImmuArr = immuArr.unshift(3, 4);
+  let arr = [1,2];
+  let immuArr = immu(arr);
+  let shiftedImmuArr = immuArr.unshift(3, 4);
 
-  assert.deepEqual(shiftedImmuArr, [3,4,1,2], 'shifted values on array');
-  assert.deepEqual(immuArr, [1,2], 'did not mutate original array');
+  deepEqual(shiftedImmuArr, [3,4,1,2], 'shifted values on array');
+  deepEqual(immuArr, [1,2], 'did not mutate original array');
 });
 
-test.arrays.mutator('reverse', function (assert) {
+test.arrays.mutator('reverse', ({deepEqual}) => {
 
-  var arr = [1,2];
-  var immuArr = immu(arr);
+  let arr = [1,2];
+  let immuArr = immu(arr);
 
-  assert.deepEqual(immuArr.reverse(), [2,1], 'reversed value');
-  assert.deepEqual(immuArr, [1,2], 'original value');
+  deepEqual(immuArr.reverse(), [2,1], 'reversed value');
+  deepEqual(immuArr, [1,2], 'original value');
 });
 
-test.arrays.mutator('sort', function (assert) {
+test.arrays.mutator('sort', ({deepEqual}) => {
 
-  var arr = [4,2,3,1];
-  var immuArr = immu(arr);
+  let arr = [4,2,3,1];
+  let immuArr = immu(arr);
 
-  assert.deepEqual(immuArr.sort(), [1,2,3,4], 'basic sort');
+  deepEqual(immuArr.sort(), [1,2,3,4], 'basic sort');
 
-  var objArr = [{age: 31}, {age: 27}, {age: 51}];
-  var immuObjArr = immu(objArr);
+  let objArr = [{age: 31}, {age: 27}, {age: 51}];
+  let immuObjArr = immu(objArr);
 
-  var sortedImmuObjArr = immuObjArr.sort(function (a, b) {
+  let sortedImmuObjArr = immuObjArr.sort(function (a, b) {
 
     if (a.age > b.age) {
       return 1;
@@ -408,20 +415,20 @@ test.arrays.mutator('sort', function (assert) {
     return 0;
   });
 
-  assert.deepEqual(
+  deepEqual(
     sortedImmuObjArr,
     [{age: 27}, {age: 31}, {age: 51}],
     'custom sort function'
   );
 });
 
-test.arrays.mutator('splice', function (assert) {
+test.arrays.mutator('splice', ({deepEqual}) => {
 
-  var arr = [1, 2, 3, 4];
-  var immuArr = immu(arr);
+  let arr = [1, 2, 3, 4];
+  let immuArr = immu(arr);
 
-  assert.deepEqual(immuArr.splice(1, 1), [1, 3, 4], 'remove item');
-  assert.deepEqual(immuArr.splice(1, 1, 'two'), [1, 'two', 3, 4], 'remove and insert');
+  deepEqual(immuArr.splice(1, 1), [1, 3, 4], 'remove item');
+  deepEqual(immuArr.splice(1, 1, 'two'), [1, 'two', 3, 4], 'remove and insert');
 });
 
 
