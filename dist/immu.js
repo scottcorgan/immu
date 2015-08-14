@@ -1,5 +1,3 @@
-// TODO: how do we handle Date, RegExp, HTMLDocument?
-
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -25,13 +23,9 @@ function immu(data) {
     return data;
   }
 
-  var __PRODUCTION__ = process && process.env && process.env.NODE_ENV === 'production';
-
   var isArray = Array.isArray(data);
   var definedProps = {
     toJS: {
-      enumerable: false,
-      configurable: false,
       value: function value() {
         return data;
       }
@@ -44,7 +38,6 @@ function immu(data) {
 
     definedProps[name] = {
       enumerable: true,
-      configurable: false,
       set: function set(newValue) {
 
         throw new Error('Cannot change value "' + name + '" to "' + newValue + '" of an immutable property');
@@ -60,9 +53,7 @@ function immu(data) {
     definedProps = immuArrProps(data, definedProps);
   }
 
-  var immuData = Object.create({}, definedProps);
-
-  return __PRODUCTION__ ? immuData : Object.freeze(immuData);
+  return Object.freeze(Object.create(Object.prototype, definedProps));
 }
 
 function immuArrProps(data, definedProps) {
@@ -71,7 +62,6 @@ function immuArrProps(data, definedProps) {
     return data.length;
   });
 
-  // TODO: memoize this
   ['forEach', 'map', 'filter', 'some', 'every'].forEach(function (name) {
 
     definedProps[name] = defProp(name, function () {
@@ -86,7 +76,6 @@ function immuArrProps(data, definedProps) {
     });
   });
 
-  // TODO: memoize this
   ['reduce', 'reduceRight'].forEach(function (name) {
 
     definedProps[name] = defProp(name, function () {
@@ -162,8 +151,6 @@ function immuArrProps(data, definedProps) {
 function defProp(name, get) {
 
   return {
-    enumerable: false, // TODO: test this
-    configurable: false, // TODO: test this
     set: function set(newValue) {
       // TODO: test this
 
