@@ -20,8 +20,6 @@ function immu (data) {
     return data;
   }
 
-  const __PRODUCTION__ = process && process.env && process.env.NODE_ENV === 'production';
-
   let isArray = Array.isArray(data);
   let definedProps = {
     toJS: {
@@ -53,9 +51,12 @@ function immu (data) {
     definedProps = immuArrProps(data, definedProps);
   }
 
-  let immuData = Object.create({}, definedProps);
-
-  return __PRODUCTION__ ? immuData : Object.freeze(immuData);
+  return Object.freeze(
+    Object.create(
+      {},
+      definedProps
+    )
+  );
 }
 
 function immuArrProps (data, definedProps) {

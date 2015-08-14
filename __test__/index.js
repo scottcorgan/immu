@@ -142,20 +142,12 @@ test('adding new attributes', ({equal, fail, pass}) => {
   let immuObj = immu(obj);
   try {
     immuObj.c = 'd';
-    fail('Shouldn\'t be able to set value on frozen object in dev environment');
+    fail('Shouldn\'t be able to set value on frozen object');
   }
   catch (e) {
     pass('frozen object in dev environment');
-    equal(immuObj.c, undefined, 'can\'t set new proprety in development');
+    equal(immuObj.c, undefined, 'can\'t set new proprety');
   }
-
-  process.env.NODE_ENV = 'production';
-  let obj2 = {
-    a: 'b'
-  };
-  let immuObj2 = immu(obj2);
-  immuObj2.c = 'd';
-  equal(immuObj2.c, 'd', 'can set new proprety in production (for performance)');
 });
 
 test.arrays('base', ({equal, deepEqual, pass, fail}) => {

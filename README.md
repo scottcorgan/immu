@@ -3,16 +3,15 @@
 ![emu](https://cloud.githubusercontent.com/assets/974723/9231290/4e67382c-40dc-11e5-84b4-fec141bc466d.jpg)
 
 
-A TINY, fail-fast, "naked", simple immutable data structure library.
+A TINY, fail-fast, lazy, "naked", simple immutable data structure library.
 
 * By *TINY*, less than 1k gzipped and minified.
 * By *fail-fast*, I mean you'll be notified if you try to change a proprety.
+* By *lazy*, I mean it doesn't evaulate the mutability of a property until it absolutely has to.
 * By *naked*, I mean they work like regular objects and arrays.
 * By *simple*, I mean that it doesn't add any extra features to your code (except immutability, of course).
 
-**Immu** doesn't use `Object.freeze()` in production, so [these performance issues](http://jsperf.com/freeze-vs-seal-vs-normal/3) aren't a concern.
-
-## Why immutable data?
+## Why use immutable data?
 
 Bugs happen because developers write them. This just puts one more layer between you and your code exloding.
 
