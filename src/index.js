@@ -53,7 +53,7 @@ function immu (data) {
 
   return Object.freeze(
     Object.create(
-      {},
+      Object.prototype,
       definedProps
     )
   );
