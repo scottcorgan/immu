@@ -1,5 +1,3 @@
-// TODO: how do we handle Date, RegExp, HTMLDocument?
-
 let alreadyImmutable = {
   'function': true,
   'string': true,
@@ -23,8 +21,6 @@ function immu (data) {
   let isArray = Array.isArray(data);
   let definedProps = {
     toJS: {
-      enumerable: false,
-      configurable: false,
       value: () => data
     }
   };
@@ -35,7 +31,6 @@ function immu (data) {
 
     definedProps[name] = {
       enumerable: true,
-      configurable: false,
       set (newValue) {
 
         throw new Error('Cannot change value "' + name + '" to "' + newValue +  '" of an immutable property');
@@ -63,7 +58,6 @@ function immuArrProps (data, definedProps) {
 
   definedProps.length = defProp('length', () => data.length);
 
-  // TODO: memoize this
   ['forEach', 'map', 'filter', 'some', 'every']
     .forEach(name => {
 
@@ -79,7 +73,6 @@ function immuArrProps (data, definedProps) {
       });
     });
 
-  // TODO: memoize this
   ['reduce', 'reduceRight']
     .forEach(name => {
 
@@ -145,8 +138,6 @@ function immuArrProps (data, definedProps) {
 function defProp (name, get) {
 
   return {
-    enumerable: false, // TODO: test this
-    configurable: false, // TODO: test this
     set (newValue) { // TODO: test this
 
       throw new Error(
