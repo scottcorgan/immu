@@ -13,7 +13,7 @@ A TINY, fail-fast, lazy, "naked", simple immutable data structure library.
 
 ## Why use immutable data?
 
-Bugs happen because developers write them. This just puts one more layer between you and your code exloding.
+Bugs happen because developers write them. This just puts one more layer between you and your code exploding.
 
 ## Install
 
