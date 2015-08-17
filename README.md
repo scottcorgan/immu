@@ -6,8 +6,8 @@
 A TINY, fail-fast, lazy, "naked", simple immutable data structure library.
 
 * By *TINY*, less than 1k gzipped and minified.
-* By *fail-fast*, I mean you'll be notified if you try to change a proprety.
-* By *lazy*, I mean it doesn't evaulate the mutability of a property until it absolutely has to.
+* By *fail-fast*, I mean you'll be notified if you try to change a property.
+* By *lazy*, I mean it doesn't evaluate the mutability of a property until it absolutely has to.
 * By *naked*, I mean they work like regular objects and arrays.
 * By *simple*, I mean that it doesn't add any extra features to your code (except immutability, of course).
 
