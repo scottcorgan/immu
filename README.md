@@ -2,8 +2,7 @@
 
 ![emu](https://cloud.githubusercontent.com/assets/974723/9231290/4e67382c-40dc-11e5-84b4-fec141bc466d.jpg)
 
-
-A TINY, fail-fast, lazy, "naked", simple immutable data structure library.
+**A TINY, fail-fast, lazy, "naked", simple immutable Javascript objects library.**
 
 * By *TINY*, less than 1k gzipped and minified.
 * By *fail-fast*, I mean you'll be notified if you try to change a property.
@@ -11,9 +10,32 @@ A TINY, fail-fast, lazy, "naked", simple immutable data structure library.
 * By *naked*, I mean they work like regular objects and arrays.
 * By *simple*, I mean that it doesn't add any extra features to your code (except immutability, of course).
 
-## Why use immutable data?
+## What Immu Aims To Solve
 
-Bugs happen because developers write them. This just puts one more layer between you and your code exploding.
+Immu aims to solve 2 things:
+
+1. Immutable javascript Ojects (Arrays are objects in Javascript).
+2. Fail-fast errors with detailed excpetions upon attempting to mutate Objects.
+
+Immu does not attempt to add functionality to Arrays, introduce complex data structures like *Map* and *Set*, or provide a complete solution with cursors and stores. Immu is meant to be the simplest possible solution to providing immutable objects while maintaining the native API for those objects (includeing Array methods).
+
+### Other libraries that are similar but do more:
+
+Each of these libraries are *GREAT* in their implementation and at the problems they solve:
+
+* [immutable](https://github.com/facebook/immutable-js)
+* [mori](https://github.com/swannodette/mori)
+* [baobab](https://github.com/Yomguithereal/baobab)
+* [seamless-immutable](https://github.com/rtfeldman/seamless-immutable)
+* [tcomb](https://github.com/gcanti/tcomb)
+* [deep-freeze](https://www.npmjs.com/package/deep-freeze)
+* [freezer](https://github.com/arqex/freezer)
+* [icedam](https://github.com/winkler1/icedam)
+* [immutable-store](https://github.com/christianalfoni/immutable-store)
+
+### Why Use Immutable Data?
+
+Bugs happen because developers write them. This just puts one more layer between you and your code exploding. Immutable data can't promise to help you avoid all bugs, but can help you reason about your state much easier!
 
 ## Install
 
@@ -29,8 +51,8 @@ npm install immu --save
 let immu = require('immu');
 
 let user = {
-  name: 'Scott',
-  age: 31,
+  name: 'Someone',
+  age: 99,
   location: 'somewhere'
 };
 

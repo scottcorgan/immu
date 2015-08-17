@@ -1,7 +1,7 @@
 {
   "name": "immu",
   "version": "1.2.2",
-  "description": "A TINY, fail-fast, lazy \"naked\", simple immutable data structure library.",
+  "description": "A TINY, fail-fast, lazy, \"naked\", simple immutable Javascript objects library",
   "main": "dist/immu.js",
   "scripts": {
     "test": "babel-node __test__/index.js | tap-spec",
