@@ -51,8 +51,8 @@ npm install immu --save
 let immu = require('immu');
 
 let user = {
-  name: 'Someone',
-  age: 99,
+  name: 'Scott',
+  age: 31,
   location: 'somewhere'
 };
 
