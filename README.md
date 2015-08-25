@@ -17,7 +17,7 @@ Immu aims to solve 2 things:
 1. Immutable javascript Ojects (Arrays are objects in Javascript).
 2. Fail-fast errors with detailed excpetions upon attempting to mutate Objects.
 
-Immu does not attempt to add functionality to Arrays, introduce complex data structures like *Map* and *Set*, or provide a complete solution with cursors and stores. Immu is meant to be the simplest possible solution to providing immutable objects while maintaining the native API for those objects (includeing Array methods).
+Immu does not attempt to add functionality to Arrays, introduce complex data structures like *Map* and *Set*, or provide a complete solution with cursors and stores. Immu is meant to be the simplest possible solution to providing immutable objects while maintaining the native API for those objects (including Array methods).
 
 ### Other libraries that are similar but do more:
 
