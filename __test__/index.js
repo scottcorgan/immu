@@ -74,6 +74,7 @@ test('deep object', ({equal, deepEqual}) => {
   deepEqual(immuDeepObj, deepObj, 'matches keep properties');
   deepEqual(immuDeepObj.a.b, {c: 'd'}, 'mostly deep property');
   equal(immuDeepObj.a.b.c, 'd', 'getter for deep property');
+  equal(immuDeepObj.a, immuDeepObj.a, 'are memoized');
 });
 
 test('mixed objects and arrays', ({equal, pass, fail}) => {
