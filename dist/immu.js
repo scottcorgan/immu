@@ -44,7 +44,7 @@ function immu(data) {
       },
       get: function get() {
 
-        return immu(value);
+        return value = immu(value);
       }
     };
   });

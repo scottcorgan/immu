@@ -37,7 +37,7 @@ function immu (data) {
       },
       get () {
 
-        return immu(value);
+        return (value = immu(value));
       }
     };
   });
