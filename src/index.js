@@ -20,17 +20,13 @@ function immu (data) {
 
   let isArray = Array.isArray(data);
   let definedProps = {
-    toJS: {
-      value: () => data
-    },
-    toJSON: {
-      value: () => data
-    }
+    toJS: {value: () => data},
+    toJSON: {value: () => data}
   };
 
   Object.keys(data).forEach(name => {
 
-    let value = data[name];
+    let value = data[name]
 
     definedProps[name] = {
       enumerable: true,
