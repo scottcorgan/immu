@@ -103,7 +103,7 @@ function immuArrProps (data, definedProps) {
       definedProps[name] = defProp(name, () => (...args) => immu(data[name](...args)));
     });
 
-  definedProps.push = defProp('push', () => (...args) => immu(data.concat(...args)));
+  definedProps.push = defProp('push', () => (...args) => immu(data.concat(args)));
   definedProps.unshift = defProp('unshift', () => (...args) => immu(args.concat(data)));
 
   definedProps.sort = defProp('sort', () => {
