@@ -343,9 +343,9 @@ test.arrays.mutator('push', ({deepEqual}) => {
 
   let arr = [1,2];
   let immuArr = immu(arr);
-  let pushedImmuArr = immuArr.push(3, 4);
+  let pushedImmuArr = immuArr.push(3, 4, [5, 6]);
 
-  deepEqual(pushedImmuArr, [1,2,3,4], 'pushed values on array');
+  deepEqual(pushedImmuArr, [1,2,3,4,[5,6]], 'pushed values on array');
   deepEqual(immuArr, [1,2], 'did not mutate original array');
 });
 
