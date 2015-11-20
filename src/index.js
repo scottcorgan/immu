@@ -22,6 +22,9 @@ function immu (data) {
   let definedProps = {
     toJS: {
       value: () => data
+    },
+    toJSON: {
+      value: () => data
     }
   };
 

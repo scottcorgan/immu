@@ -424,6 +424,14 @@ test.arrays.mutator('splice', ({deepEqual}) => {
   deepEqual(immuArr.splice(1, 1, 'two'), [1, 'two', 3, 4], 'remove and insert');
 });
 
+test.arrays('JSON.stringify()', ({deepEqual}) => {
+
+  let arr = [1, 2, 3, 4];
+  let immuArr = immu(arr);
+
+  deepEqual(JSON.stringify(immuArr), JSON.stringify(arr), 'stringified');
+})
+
 
 
 
