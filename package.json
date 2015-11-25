@@ -6,14 +6,15 @@
   "scripts": {
     "test": "babel-node __test__/index.js | tap-spec",
     "build": "npm run build-dev && uglifyjs --compress --mangle --output dist/immu.min.js -- dist/immu.js",
-    "build-dev": "babel src/index.js --out-file dist/immu.js"
+    "build-dev": "babel src/index.js --out-file dist/immu.js",
+    "prepublish": "npm run build"
   },
   "author": "Scott Corgan",
   "license": "MIT",
   "devDependencies": {
     "babel": "^5.8.21",
     "tap-spec": "^4.0.2",
-    "tessed": "^2.0.0",
+    "tessed": "^2.2.0",
     "uglify-js": "^2.4.24"
   },
   "repository": {
