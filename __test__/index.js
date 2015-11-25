@@ -248,16 +248,27 @@ test.arrays.iteration('every', ({deepEqual}) => {
   deepEqual(everyArr, true, 'every value');
 });
 
-test.arrays.iteration('reduce', ({equal}) => {
+test.arrays.iteration('reduce', ({equal, deepEqual, plan}) => {
+
+  plan(5)
 
   let arr = [1,2,3,4];
-  // let arr2 = [{a: 'b'}]
+  let arr2 = [{a: 'b'}]
   let immuArr = immu(arr);
-  let total = immuArr.reduce(function (prev, curr) {
+  let immuArr2 = immu(arr2)
+  let total = immuArr.reduce(function (accum, curr) {
 
-    return String(prev) + String(curr);
+    return String(accum) + String(curr);
   }, 0);
+  let total2 = immuArr2.reduce(function (accum, curr) {
 
+    equal(typeof curr.toJS, 'function', 'is immutable value')
+    equal(typeof accum.toJS, 'function', 'accumulator is immutable')
+    deepEqual(curr, immuArr2[0], 'passes in immutable value')
+    return accum
+  }, {})
+
+  equal(typeof total2.toJS, 'function', 'reduced to immutable value')
   equal(total, '01234', 'concatenated all numbers');
 });
 
