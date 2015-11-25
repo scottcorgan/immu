@@ -1,21 +1,21 @@
 const IMMUTABLE_TYPES = {
-  'function': true,
-  'string': true,
-  'boolean': true,
-  'number': true,
-  'undefined': true
-};
+  function: true,
+  string: true,
+  boolean: true,
+  number: true,
+  undefined: true
+}
 
 export default function immu (data) {
 
   // Values that are already immutable
   if (IMMUTABLE_TYPES[typeof data] !== undefined || data === null) {
-    return data;
+    return data
   }
 
   // Already immutable
   if (typeof data.toJS === 'function') {
-    return data;
+    return data
   }
 
   return Object.freeze(
@@ -35,14 +35,14 @@ function immutableObject (obj) {
       enumerable: true,
       set (newValue) {
 
-        throw new Error('Cannot change value "' + name + '" to "' + newValue +  '" of an immutable property');
+        throw new Error('Cannot change value "' + name + '" to "' + newValue +  '" of an immutable property')
       },
       get () {
 
-        return (value = immu(value));
+        return (value = immu(value))
       }
-    };
-  });
+    }
+  })
 
   return Object.create(
     Object.getPrototypeOf(obj),
@@ -75,11 +75,11 @@ function immutableArray (arr) {
 
       return function (...args) {
 
-        let start = args[0];
-        let deleteCount = args[1];
-        let items = args.slice(2) || [];
-        let beginning = data.slice(0, start);
-        let end = data.slice(start + deleteCount);
+        let start = args[0]
+        let deleteCount = args[1]
+        let items = args.slice(2) || []
+        let beginning = data.slice(0, start)
+        let end = data.slice(start + deleteCount)
 
         return beginning.concat(items, end)
       }
@@ -130,7 +130,7 @@ function defineProp (name, get) {
 
       throw new Error(
         'Cannot change value "' + name + '" to "' + newValue +  '" of an immutable property'
-      );
+      )
     },
     get
   }
