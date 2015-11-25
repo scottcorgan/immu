@@ -1,4 +1,4 @@
-let alreadyImmutable = {
+const IMMUTABLE_TYPES = {
   'function': true,
   'string': true,
   'boolean': true,
@@ -6,10 +6,10 @@ let alreadyImmutable = {
   'undefined': true
 };
 
-function immu (data) {
+export default function immu (data) {
 
   // Values that are already immutable
-  if (alreadyImmutable[typeof data] !== undefined || data === null) {
+  if (IMMUTABLE_TYPES[typeof data] !== undefined || data === null) {
     return data;
   }
 
@@ -18,18 +18,18 @@ function immu (data) {
     return data;
   }
 
-  let isArray = Array.isArray(data);
-  let definedProps = {
-    toJS: {value: () => data},
-    toJSON: {value: () => data},
-    valueOf: {value: () => data.valueOf()},
-    toString: {value: () => data.toString()},
-    toLocaleString: {value: () => data.toLocaleString()}
-  };
+  return Object.freeze(
+    Array.isArray(data) ? immutableArray(data) : immutableObject(data)
+  )
+}
 
-  Object.keys(data).forEach(name => {
+function immutableObject (obj) {
 
-    let value = data[name]
+  let definedProps = defineDefaultProps(obj)
+
+  Object.keys(obj).forEach(name => {
+
+    let value = obj[name]
 
     definedProps[name] = {
       enumerable: true,
@@ -44,28 +44,23 @@ function immu (data) {
     };
   });
 
-  function immuArr (arr) {
+  return Object.create(
+    Object.getPrototypeOf(obj),
+    definedProps
+  )
+}
 
-    let data = arr.slice(0).map(immu)
+function immutableArray (arr) {
 
-    function iterators (arr, iter) {
-
-      return fn => immu(arr[iter]((...args) => fn(...(args.map(immu)))))
-    }
-    function immutators (arr, mut) {
-
-      return (...args) => immu(arr[mut](...args))
-    }
-
-    let iteratorNames = ['forEach', 'map', 'filter', 'some', 'every']
-    let reducerNames = ['reduce', 'reduceRight']
-    let immutatorNames = ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse']
-    let props = {
-      toJS: {value: () => arr},
-      push: defProp('push', () => (...args) => immu(data.concat(args))),
-      unshift: defProp('unshift', () => (...args) => immu(args.concat(data)))
-    }
-    props.sort = defProp('sort', () => {
+  let data = arr.slice(0).map(immu)
+  let iteratorNames = ['forEach', 'map', 'filter', 'some', 'every']
+  let reducerNames = ['reduce', 'reduceRight']
+  let immutatorNames = ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse']
+  let props = {
+    ...defineDefaultProps(arr),
+    push: defineProp('push', () => (...args) => immu(data.concat(args))),
+    unshift: defineProp('unshift', () => (...args) => immu(args.concat(data))),
+    sort: defineProp('sort', () => {
 
       return fn => {
 
@@ -75,52 +70,60 @@ function immu (data) {
 
         return immu(arr.sort((a, b) => fn(immu(a), immu(b))))
       }
+    }),
+    splice: defineProp('splice', function () {
+
+      return function (...args) {
+
+        let start = args[0];
+        let deleteCount = args[1];
+        let items = args.slice(2) || [];
+        let beginning = data.slice(0, start);
+        let end = data.slice(start + deleteCount);
+
+        return beginning.concat(items, end)
+      }
     })
-    props.splice = defProp('splice', function () {
-
-        return function (...args) {
-
-          let start = args[0];
-          let deleteCount = args[1];
-          let items = args.slice(2) || [];
-          let beginning = data.slice(0, start);
-          let end = data.slice(start + deleteCount);
-
-          return beginning.concat(items, end)
-        }
-      })
-    iteratorNames.forEach(name => props[name] = defProp(name, () => iterators(arr, name)))
-    reducerNames.forEach(name => {
-
-      props[name] = defProp(name, () => {
-
-        return (fn, initialValue) => {
-
-          return immu(arr[name]((prev, curr, idx) => {
-
-            return fn(immu(prev), immu(curr), idx, immu(data))
-          }, immu(initialValue)))
-        }
-      })
-    })
-    immutatorNames.forEach(name => props[name] = defProp(name, () => immutators(arr, name)))
-
-    Object.defineProperties(data, props)
-    return data
   }
 
-  function immuObj (obj) {
+  iteratorNames.forEach(name => props[name] = defineProp(name, () => iterators(arr, name)))
+  immutatorNames.forEach(name => props[name] = defineProp(name, () => immutators(arr, name)))
+  reducerNames.forEach(name => {
 
-    return Object.create(
-      Object.getPrototypeOf(obj),
-      definedProps
-    )
-  }
+    props[name] = defineProp(name, () => {
 
-  return Object.freeze(isArray ? immuArr(data) : immuObj(data));
+      return (fn, initialValue) => {
+
+        return immu(arr[name]((...args) => fn(...(args.map(immu))), immu(initialValue)))
+      }
+    })
+  })
+
+  return Object.defineProperties(data, props)
 }
 
-function defProp (name, get) {
+function iterators (arr, iter) {
+
+  return fn => immu(arr[iter]((...args) => fn(...(args.map(immu)))))
+}
+
+function immutators (arr, immutator) {
+
+  return (...args) => immu(arr[immutator](...args))
+}
+
+function defineDefaultProps (data) {
+
+  return {
+    toJS: {value: () => data},
+    toJSON: {value: () => data},
+    valueOf: {value: () => data.valueOf()},
+    toString: {value: () => data.toString()},
+    toLocaleString: {value: () => data.toLocaleString()}
+  }
+}
+
+function defineProp (name, get) {
 
   return {
     set (newValue) { // TODO: test this
@@ -132,5 +135,3 @@ function defProp (name, get) {
     get
   }
 }
-
-export default immu;
