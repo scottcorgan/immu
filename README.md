@@ -74,6 +74,8 @@ let list = immu([1, 2, 3, 4]);
 let newList = list
   .map(item => item + 1)
   .filter(item => item % 2 === 0);
+  
+console.log(Array.isArray(list)) // true
 ```
 
 ## Run Tests
