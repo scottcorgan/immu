@@ -21,7 +21,10 @@ function immu (data) {
   let isArray = Array.isArray(data);
   let definedProps = {
     toJS: {value: () => data},
-    toJSON: {value: () => data}
+    toJSON: {value: () => data},
+    valueOf: {value: () => data.valueOf()},
+    toString: {value: () => data.toString()},
+    toLocaleString: {value: () => data.toLocaleString()}
   };
 
   Object.keys(data).forEach(name => {
@@ -41,97 +44,80 @@ function immu (data) {
     };
   });
 
-  if (isArray) {
-    definedProps = immuArrProps(data, definedProps);
-  }
+  function immuArr (arr) {
 
-  return Object.freeze(
-    Object.create(
-      Object.prototype,
-      definedProps
-    )
-  );
-}
+    let data = arr.slice(0).map(immu)
 
-function immuArrProps (data, definedProps) {
+    function iterators (arr, iter) {
 
-  definedProps.length = defProp('length', () => data.length);
+      return fn => immu(arr[iter]((...args) => fn(...(args.map(immu)))))
+    }
+    function immutators (arr, mut) {
 
-  ['forEach', 'map', 'filter', 'some', 'every']
-    .forEach(name => {
+      return (...args) => immu(arr[mut](...args))
+    }
 
-      definedProps[name] = defProp(name, () => {
+    let iteratorNames = ['forEach', 'map', 'filter', 'some', 'every']
+    let reducerNames = ['reduce', 'reduceRight']
+    let immutatorNames = ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse']
+    let props = {
+      toJS: {value: () => arr},
+      push: defProp('push', () => (...args) => immu(data.concat(args))),
+      unshift: defProp('unshift', () => (...args) => immu(args.concat(data)))
+    }
+    props.sort = defProp('sort', () => {
 
-        return fn => {
+      return fn => {
 
-          return immu(data[name]((val, idx) => {
+        if (!fn) {
+          return immu(arr.sort())
+        }
 
-            return fn(immu(val), idx, immu(data));
-          }));
-        };
-      });
-    });
+        return immu(arr.sort((a, b) => fn(immu(a), immu(b))))
+      }
+    })
+    props.splice = defProp('splice', function () {
 
-  ['reduce', 'reduceRight']
-    .forEach(name => {
+        return function (...args) {
 
-      definedProps[name] = defProp(name, () => {
+          let start = args[0];
+          let deleteCount = args[1];
+          let items = args.slice(2) || [];
+          let beginning = data.slice(0, start);
+          let end = data.slice(start + deleteCount);
+
+          return beginning.concat(items, end)
+        }
+      })
+    iteratorNames.forEach(name => props[name] = defProp(name, () => iterators(arr, name)))
+    reducerNames.forEach(name => {
+
+      props[name] = defProp(name, () => {
 
         return (fn, initialValue) => {
 
-          return immu(data[name]((prev, curr, idx) => {
+          return immu(arr[name]((prev, curr, idx) => {
 
-            return fn(immu(prev), immu(curr), idx, immu(data));
-          }, initialValue));
-        };
-      });
-    });
+            return fn(immu(prev), immu(curr), idx, immu(data))
+          }, immu(initialValue)))
+        }
+      })
+    })
+    immutatorNames.forEach(name => props[name] = defProp(name, () => immutators(arr, name)))
 
-  [
-    'concat',
-    'join',
-    'slice',
-    'indexOf',
-    'lastIndexOf',
-    'reverse',
-    'toString',
-    'toLocaleString'
-  ]
-    .forEach(name => {
+    Object.defineProperties(data, props)
+    return data
+  }
 
-      definedProps[name] = defProp(name, () => (...args) => immu(data[name](...args)));
-    });
+  function immuObj (obj) {
 
-  definedProps.push = defProp('push', () => (...args) => immu(data.concat(args)));
-  definedProps.unshift = defProp('unshift', () => (...args) => immu(args.concat(data)));
+    return Object.create(
+      Object.getPrototypeOf(obj),
+      definedProps
+    )
+  }
 
-  definedProps.sort = defProp('sort', () => {
-
-    return fn => {
-
-      if (!fn) {
-        return immu(data.sort());
-      }
-
-      return immu(data.sort((a, b) => fn(immu(a), immu(b))));
-    };
-  });
-
-  definedProps.splice = defProp('splice', function () {
-
-    return function (...args) {
-
-      let start = args[0];
-      let deleteCount = args[1];
-      let items = args.slice(2) || [];
-      let beginning = data.slice(0, start);
-      let end = data.slice(start + deleteCount);
-
-      return beginning.concat(items, end);
-    };
-  });
-
-  return definedProps;
+  return Object.freeze(isArray ? immuArr(data) : immuObj(data));
 }
 
 function defProp (name, get) {

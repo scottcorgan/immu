@@ -157,9 +157,7 @@ test.arrays('base', ({equal, deepEqual, pass, fail}) => {
   let immuArr = immu(arr);
 
   deepEqual(immuArr, arr, 'is equal');
-
-  // NOTE: does this even matter?
-  // equal(Array.isArray(immuArr), true, 'is an array');
+  equal(Array.isArray(immuArr), true, 'is an array');
 
   try {
     immuArr[0] = 'asdf';
@@ -253,6 +251,7 @@ test.arrays.iteration('every', ({deepEqual}) => {
 test.arrays.iteration('reduce', ({equal}) => {
 
   let arr = [1,2,3,4];
+  // let arr2 = [{a: 'b'}]
   let immuArr = immu(arr);
   let total = immuArr.reduce(function (prev, curr) {
 

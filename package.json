@@ -6,7 +6,8 @@
   "scripts": {
     "test": "babel-node __test__/index.js | tap-spec",
     "build": "npm run build-dev && uglifyjs --compress --mangle --output dist/immu.min.js -- dist/immu.js",
-    "build-dev": "babel src/index.js --out-file dist/immu.js"
+    "build-dev": "babel src/index.js --out-file dist/immu.js",
+    "prepublish": "npm run build"
   },
   "author": "Scott Corgan",
   "license": "MIT",
