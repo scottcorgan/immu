@@ -71,9 +71,9 @@ function immutableArray (arr) {
         return immu(arr.sort((a, b) => fn(immu(a), immu(b))))
       }
     }),
-    splice: defineProp('splice', function () {
+    splice: defineProp('splice', () => {
 
-      return function (...args) {
+      return (...args) => {
 
         let start = args[0]
         let deleteCount = args[1]
