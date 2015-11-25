@@ -3,18 +3,25 @@
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var alreadyImmutable = {
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports['default'] = immu;
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+var IMMUTABLE_TYPES = {
   'function': true,
-  'string': true,
-  'boolean': true,
-  'number': true,
-  'undefined': true
+  string: true,
+  boolean: true,
+  number: true,
+  undefined: true
 };
 
 function immu(data) {
 
   // Values that are already immutable
-  if (alreadyImmutable[typeof data] !== undefined || data === null) {
+  if (IMMUTABLE_TYPES[typeof data] !== undefined || data === null) {
     return data;
   }
 
@@ -23,18 +30,16 @@ function immu(data) {
     return data;
   }
 
-  var isArray = Array.isArray(data);
-  var definedProps = {
-    toJS: {
-      value: function value() {
-        return data;
-      }
-    }
-  };
+  return Object.freeze(Array.isArray(data) ? immutableArray(data) : immutableObject(data));
+}
 
-  Object.keys(data).forEach(function (name) {
+function immutableObject(obj) {
 
-    var value = data[name];
+  var definedProps = defineDefaultProps(obj);
+
+  Object.keys(obj).forEach(function (name) {
+
+    var value = obj[name];
 
     definedProps[name] = {
       enumerable: true,
@@ -49,106 +54,137 @@ function immu(data) {
     };
   });
 
-  if (isArray) {
-    definedProps = immuArrProps(data, definedProps);
-  }
-
-  return Object.freeze(Object.create(Object.prototype, definedProps));
+  return Object.create(Object.getPrototypeOf(obj), definedProps);
 }
 
-function immuArrProps(data, definedProps) {
+function immutableArray(arr) {
 
-  definedProps.length = defProp('length', function () {
-    return data.length;
-  });
+  var data = arr.slice(0).map(immu);
+  var iteratorNames = ['forEach', 'map', 'filter', 'some', 'every'];
+  var reducerNames = ['reduce', 'reduceRight'];
+  var immutatorNames = ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse'];
+  var props = _extends({}, defineDefaultProps(arr), {
+    push: defineProp('push', function () {
+      return function () {
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
 
-  ['forEach', 'map', 'filter', 'some', 'every'].forEach(function (name) {
+        return immu(data.concat(args));
+      };
+    }),
+    unshift: defineProp('unshift', function () {
+      return function () {
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
 
-    definedProps[name] = defProp(name, function () {
+        return immu(args.concat(data));
+      };
+    }),
+    sort: defineProp('sort', function () {
 
       return function (fn) {
 
-        return immu(data[name](function (val, idx) {
+        if (!fn) {
+          return immu(arr.sort());
+        }
 
-          return fn(immu(val), idx, immu(data));
+        return immu(arr.sort(function (a, b) {
+          return fn(immu(a), immu(b));
         }));
       };
-    });
+    }),
+    splice: defineProp('splice', function () {
+
+      return function () {
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
+        }
+
+        var start = args[0];
+        var deleteCount = args[1];
+        var items = args.slice(2) || [];
+        var beginning = data.slice(0, start);
+        var end = data.slice(start + deleteCount);
+
+        return beginning.concat(items, end);
+      };
+    })
   });
 
-  ['reduce', 'reduceRight'].forEach(function (name) {
+  iteratorNames.forEach(function (name) {
+    return props[name] = defineProp(name, function () {
+      return iterators(arr, name);
+    });
+  });
+  immutatorNames.forEach(function (name) {
+    return props[name] = defineProp(name, function () {
+      return immutators(arr, name);
+    });
+  });
+  reducerNames.forEach(function (name) {
 
-    definedProps[name] = defProp(name, function () {
+    props[name] = defineProp(name, function () {
 
       return function (fn, initialValue) {
 
-        return immu(data[name](function (prev, curr, idx) {
+        return immu(arr[name](function () {
+          for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
+          }
 
-          return fn(immu(prev), immu(curr), idx, immu(data));
-        }, initialValue));
+          return fn.apply(undefined, _toConsumableArray(args.map(immu)));
+        }, immu(initialValue)));
       };
     });
   });
 
-  ['concat', 'join', 'slice', 'indexOf', 'lastIndexOf', 'reverse', 'toString', 'toLocaleString'].forEach(function (name) {
-
-    definedProps[name] = defProp(name, function () {
-      return function () {
-        return immu(data[name].apply(data, arguments));
-      };
-    });
-  });
-
-  definedProps.push = defProp('push', function () {
-    return function () {
-      return immu(data.concat.apply(data, arguments));
-    };
-  });
-  definedProps.unshift = defProp('unshift', function () {
-    return function () {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return immu(args.concat(data));
-    };
-  });
-
-  definedProps.sort = defProp('sort', function () {
-
-    return function (fn) {
-
-      if (!fn) {
-        return immu(data.sort());
-      }
-
-      return immu(data.sort(function (a, b) {
-        return fn(immu(a), immu(b));
-      }));
-    };
-  });
-
-  definedProps.splice = defProp('splice', function () {
-
-    return function () {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      var start = args[0];
-      var deleteCount = args[1];
-      var items = args.slice(2) || [];
-      var beginning = data.slice(0, start);
-      var end = data.slice(start + deleteCount);
-
-      return beginning.concat(items, end);
-    };
-  });
-
-  return definedProps;
+  return Object.defineProperties(data, props);
 }
 
-function defProp(name, get) {
+function iterators(arr, iter) {
+
+  return function (fn) {
+    return immu(arr[iter](function () {
+      for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        args[_key5] = arguments[_key5];
+      }
+
+      return fn.apply(undefined, _toConsumableArray(args.map(immu)));
+    }));
+  };
+}
+
+function immutators(arr, immutator) {
+
+  return function () {
+    return immu(arr[immutator].apply(arr, arguments));
+  };
+}
+
+function defineDefaultProps(data) {
+
+  return {
+    toJS: { value: function value() {
+        return data;
+      } },
+    toJSON: { value: function value() {
+        return data;
+      } },
+    valueOf: { value: function value() {
+        return data.valueOf();
+      } },
+    toString: { value: function value() {
+        return data.toString();
+      } },
+    toLocaleString: { value: function value() {
+        return data.toLocaleString();
+      } }
+  };
+}
+
+function defineProp(name, get) {
 
   return {
     set: function set(newValue) {
@@ -159,6 +195,4 @@ function defProp(name, get) {
     get: get
   };
 }
-
-exports['default'] = immu;
 module.exports = exports['default'];
