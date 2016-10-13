@@ -17,7 +17,7 @@ test('returns fast for non-object values', ({equal}) => {
 
   let num = 1
   let immuNum = immu(num)
-  equal(immuNum, num, 'does nother to numbers')
+  equal(immuNum, num, 'does nothing to numbers')
 
   let nully = null
   let immuNully = immu(nully)
@@ -30,6 +30,10 @@ test('returns fast for non-object values', ({equal}) => {
   let bool = false
   let immuBool = immu(bool)
   equal(immuBool, bool, 'does nothing to boolean')
+
+  let sym = Symbol('sym')
+  let immuSym = immu(sym)
+  equal(immuSym, sym, 'does nothing to boolean')
 
   // NOTE: since functions can have properties as well, how do we immu this?
   let func = function () {}

@@ -3,7 +3,8 @@ const IMMUTABLE_TYPES = {
   string: true,
   boolean: true,
   number: true,
-  undefined: true
+  undefined: true,
+  symbol: true
 }
 
 export default function immu (data) {
