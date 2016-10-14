@@ -15,7 +15,8 @@ var IMMUTABLE_TYPES = {
   string: true,
   boolean: true,
   number: true,
-  undefined: true
+  undefined: true,
+  symbol: true
 };
 
 function immu(data) {
