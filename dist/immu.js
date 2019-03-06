@@ -22,7 +22,7 @@ var IMMUTABLE_TYPES = {
 function immu(data) {
 
   // promises are not immutables
-  if (data[Symbol.toStringTag] === 'Promise') {
+  if (data && data[Symbol.toStringTag] === 'Promise') {
     return data;
   }
 
