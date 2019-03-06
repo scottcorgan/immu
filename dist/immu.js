@@ -21,6 +21,11 @@ var IMMUTABLE_TYPES = {
 
 function immu(data) {
 
+  // promises are not immutables
+  if (data[Symbol.toStringTag] === 'Promise') {
+    return data;
+  }
+
   // Values that are already immutable
   if (IMMUTABLE_TYPES[typeof data] !== undefined || data === null) {
     return data;
