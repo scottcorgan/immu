@@ -9,6 +9,11 @@ const IMMUTABLE_TYPES = {
 
 export default function immu (data) {
 
+  // promises are not immutables
+  if(data && data[Symbol.toStringTag] === 'Promise'){
+    return data;
+  }
+
   // Values that are already immutable
   if (IMMUTABLE_TYPES[typeof data] !== undefined || data === null) {
     return data

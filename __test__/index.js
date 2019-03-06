@@ -446,6 +446,38 @@ test.arrays('JSON.stringify()', ({deepEqual}) => {
   deepEqual(JSON.stringify(immuArr), JSON.stringify(arr), 'stringified')
 })
 
+test.arrays('Promises should not be alter by immu', ({equal}) => {
+  const immuArr = immu([1, 2, 3, Promise.resolve(), 4]);
+
+  equal(immuArr[3][Symbol.toStringTag], 'Promise');
+})
+
+test('Promises should not be alter by immu', ({equal}) => {
+  const resolvedPromise = Promise.resolve();
+  let immuPromise = immu(resolvedPromise)
+  equal(immuPromise, resolvedPromise)
+})
+
+test.arrays('map to promise, promise should not be alter by immu', ({equal}) => {
+  const arr = [1, 2]
+  const immuArr = immu(arr)
+
+  const promiseArrFromImmu = immuArr.map(() => Promise.resolve())
+  equal(promiseArrFromImmu[0][Symbol.toStringTag], 'Promise');
+  equal(promiseArrFromImmu[1][Symbol.toStringTag], 'Promise');
+})
+
+test.arrays('Promise.all over immu array should not fail', ({pass, fail}) => {
+  const arr = [1, 2 , 3, 4]
+  const immuArr = immu(arr)
+
+  const promiseArrFromImmu = immuArr.map(() => Promise.resolve())
+
+  Promise.all(promiseArrFromImmu)
+    .then(() => pass('Promise.all was executed with no exception'))
+    .catch(() => fail('Promise.all failed to execute'));
+})
+
 
 
 
